@@ -57,7 +57,9 @@ func main() {
 	// hook path with function - Get to specify only GET method is allowed at this path
 	v1Router.Get("/healthz", handlerReadiness)
 	v1Router.Get("/err", handlerErr)
+	// use apiCfg value to call handler methods that uses database 
 	v1Router.Post("/users", apiCfg.handlerCreateUser)
+	v1Router.Get("/users", apiCfg.handlerGetUser)
 
 	// -> /v1/ready
 	router.Mount("/v1", v1Router)
