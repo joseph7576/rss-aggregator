@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/joseph7576/rss-aggregator/internal/auth"
 	"github.com/joseph7576/rss-aggregator/internal/database"
 )
 
@@ -40,18 +39,6 @@ func (apiCfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Reques
 }
 
 // we pass *apiConfig -> to get access to our database queries
-func (apiCfg *apiConfig) handlerGetUser(w http.ResponseWriter, r *http.Request) {
-	apiKey, err := auth.GetAPIKey(r.Header)
-	if err != nil {
-		respondWithError(w, http.StatusBadRequest, fmt.Sprintf("Auth error: %v", err))
-		return
-	}
-
-	user, err := apiCfg.DB.GetUserByAPIKey(r.Context(), apiKey)
-	if err != nil {
-		respondWithError(w, http.StatusBadRequest, fmt.Sprintf("Couldn't get user: %v", err))
-		return
-	}
-
+func (apiCfg *apiConfig) handlerGetUser(w http.ResponseWriter, r *http.Request, user database.User) {
 	respondWithJSON(w, http.StatusOK, databaseUserToUser(user))
 }
