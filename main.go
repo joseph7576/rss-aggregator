@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
@@ -19,6 +20,14 @@ type apiConfig struct {
 }
 
 func main() {
+
+	// feed, err := urlToFeed("https://www.wagslane.dev/index.xml")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	// fmt.Println(feed)
+
 	godotenv.Load()
 
 	portString := os.Getenv("PORT")
@@ -36,8 +45,9 @@ func main() {
 		log.Fatal("Can't connect to database: ", err)
 	}
 
+	db := database.New(connection)
 	apiCfg := apiConfig{
-		DB: database.New(connection),
+		DB: db,
 	}
 
 	router := chi.NewRouter()
@@ -50,6 +60,9 @@ func main() {
 		AllowCredentials: false,
 		MaxAge:           300,
 	}))
+
+	// call scraping
+	go startScraping(db, 10, time.Minute)
 
 	// new router for testing
 	v1Router := chi.NewRouter()
